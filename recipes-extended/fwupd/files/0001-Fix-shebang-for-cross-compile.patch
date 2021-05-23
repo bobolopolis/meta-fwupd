@@ -1,0 +1,24 @@
+From 3deb45bfa35c9167a94700321f38de0326f30b89 Mon Sep 17 00:00:00 2001
+From: Robert Joslyn <robert.joslyn@redrectangle.org>
+Date: Sat, 25 Apr 2020 19:55:18 -0700
+Subject: [PATCH] Fix shebang for cross-compile
+
+Avoid calling the host python by using env to find the native sysroot
+python.
+---
+ contrib/generate-version-script.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contrib/generate-version-script.py b/contrib/generate-version-script.py
+index b506a43e..14aa5446 100755
+--- a/contrib/generate-version-script.py
++++ b/contrib/generate-version-script.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/env python3
+ # pylint: disable=invalid-name,missing-docstring
+ #
+ # Copyright (C) 2017 Richard Hughes <richard@hughsie.com>
+-- 
+2.26.2
+

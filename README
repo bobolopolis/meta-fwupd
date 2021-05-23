@@ -1,0 +1,7 @@
+This layer provides recipes needed to build fwupd within OpenEmbedded.
+
+The fwupd recipe supports many different plugins for various hardware. Due to
+the wide variety of hardware and the desire of many OE users to build minimal
+images, the recipe disables all optional plugins by default. It may be
+necessary to enable various PACKAGECONFIG options to obtain the desired
+behavior on a specific platform.
