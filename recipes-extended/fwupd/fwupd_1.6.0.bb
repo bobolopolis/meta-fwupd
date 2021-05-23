@@ -15,6 +15,7 @@ DEPENDS = " \
 
 SRC_URI = "git://github.com/fwupd/fwupd.git"
 SRC_URI += "file://0001-Fix-shebang-for-cross-compile.patch"
+SRC_URI += "file://0001-Define-gmodule-unconditionally.patch"
 SRCREV = "ba890cde4621aca2b8d52a5862bcaea4b390a921"
 
 S = "${WORKDIR}/git"
@@ -23,12 +24,8 @@ inherit bash-completion gobject-introspection gtk-doc gtk-icon-cache manpages me
 
 GTKDOC_MESON_OPTION = "gtkdoc"
 
-# Select from all, standalone, or library.
-FWUPD_BUILD_TYPE ??= "all"
-
-EXTRA_OEMESON = "-Dbuild=${FWUPD_BUILD_TYPE}"
 # Requires libsmbios_c which does not yet have a recipe.
-EXTRA_OEMESON += "-Dplugin_dell=false"
+EXTRA_OEMESON = "-Dplugin_dell=false"
 # Requires pangocairo gobject introspection library
 EXTRA_OEMESON += "-Dplugin_uefi_capsule_splash=false"
 # OE projects probably don't care about QubesOS support
@@ -41,11 +38,18 @@ EXTRA_OEMESON += "-Dtests=false"
 # separate recipe.
 EXTRA_OEMESON += "-Defi_binary=false"
 
+# Keep PACKAGECONFIG options in the same order as upstream meson_options.txt
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'polkit systemd', d)} \
-    gusb \
+    build-all \
 "
-# Keep PACKAGECONFIG options in the same order as upstream meson_options.txt
+
+# Select one of all, standalone, or library. all and standalone require gusb
+# to be enabled. library requires gusb to be disabled.
+PACKAGECONFIG[build-all] = "-Dbuild=all -Dgusb=true,,udev libgusb"
+PACKAGECONFIG[build-standalone] = "-Dbuild=standalone -Dgusb=true,,libgusb"
+PACKAGECONFIG[build-library] = "-Dbuild=library -Dgusb=false"
+
 PACKAGECONFIG[agent] = "-Dagent=true,-Dagent=false"
 PACKAGECONFIG[consolekit] = "-Dconsolekit=true,-Dconsolekit=false"
 PACKAGECONFIG[firmware-packager] = "-Dfirmware-packager=true,-Dfirmware-packager=false,,python3-core"
@@ -53,12 +57,10 @@ PACKAGECONFIG[lvfs] = "-Dlvfs=true,-Dlvfs=false"
 PACKAGECONFIG[manpages] = "-Dman=true,-Dman=false"
 PACKAGECONFIG[libarchive] = "-Dlibarchive=true,-Dlibarchive=false,libarchive"
 PACKAGECONFIG[gudev] = "-Dgudev=true,-Dgudev=false,libgudev"
-PACKAGECONFIG[gusb] = "-Dgusb=true,-Dgusb=false,libgusb"
 PACKAGECONFIG[bluez] = "-Dbluez=true,-Dbluez=false"
 PACKAGECONFIG[polkit] = "-Dpolkit=true,-Dpolkit=false,polkit udev"
 PACKAGECONFIG[gnutls] = "-Dgnutls=true,-Dgnutls=false,gnutls"
 PACKAGECONFIG[lzma] = "-Dlzma=true,-Dlzma=false,xz"
-
 PACKAGECONFIG[plugin_altos] = "-Dplugin_altos=true,-Dplugin_altos=false,elfutils"
 PACKAGECONFIG[plugin_amt] = "-Dplugin_amt=true,-Dplugin_amt=false"
 PACKAGECONFIG[plugin_dummy] = "-Dplugin_dummy=true,-Dplugin_dummy=false"

@@ -1,0 +1,29 @@
+From b46888b28c52de758456b27d0bad646855027c9b Mon Sep 17 00:00:00 2001
+From: Robert Joslyn <robert.joslyn@redrectangle.org>
+Date: Sun, 23 May 2021 07:42:11 -0700
+Subject: [PATCH] Define gmodule unconditionally
+
+The gmodule variable is used with -Dbuild=library, so it must be defined
+for all build types. Move the definition out from the standalone
+conditional.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index ca28ff94..b73e8b35 100644
+--- a/meson.build
++++ b/meson.build
+@@ -198,8 +198,8 @@ endif
+ if gio.version().version_compare ('>= 2.55.0')
+   conf.set('HAVE_GIO_2_55_0', '1')
+ endif
+-if build_standalone
+ gmodule = dependency('gmodule-2.0')
++if build_standalone
+ if get_option('gudev')
+   gudev = dependency('gudev-1.0', version : '>= 232')
+   conf.set('HAVE_GUDEV', '1')
+-- 
+2.26.3
+
